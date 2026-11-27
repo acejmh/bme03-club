@@ -7,6 +7,8 @@
 <title>의공03 모임 장부</title>
 <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#10141a" media="(prefers-color-scheme: dark)">
+<link rel="icon" type="image/png" href="konkuk-emblem.png">
+<link rel="apple-touch-icon" href="konkuk-emblem.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
@@ -34,7 +36,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 .top h1{margin:0;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
 .top p{margin:4px 0 0;color:var(--ink-2);font-size:13.5px}
-.officers{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-t{min-width:0}
+.emblem{width:56px;height:56px;flex:none;display:block}
+.officers{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
 .officers li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2);padding:5px 0;border-top:1px dashed var(--rule)}
 .officers li:first-child{border-top:0}
 .officers li.cur{color:var(--ink)}
@@ -258,8 +263,11 @@ footer{color:var(--ink-3);font-size:12.5px;text-align:center;display:flex;flex-d
     return h('ul',{class:'officers','aria-label':'임원진'},rows);
   }
   function header(){
-    return h('header',{class:'top'},h('h1',null,S.club+' 모임 장부'),
-      S.clubFull?h('p',null,S.clubFull):null,officers());
+    return h('header',{class:'top'},
+      h('div',{class:'brand'},
+        h('img',{src:'konkuk-emblem.png',alt:'건국대학교 엠블럼',width:'56',height:'56',class:'emblem'}),
+        h('div',{class:'brand-t'},h('h1',null,S.club+' 모임 장부'),S.clubFull?h('p',null,S.clubFull):null)),
+      officers());
   }
   function book(){
     return h('div',{class:'book'},
