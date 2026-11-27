@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>의공03 모임 장부</title>
+<meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10141a" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: one phone-width column read top to bottom, like flipping a passbook: balance, this month, vote, ledger, extras, birthdays, meetups. */
+:root{
+  --paper:#f2f4f7;--sheet:#ffffff;--ink:#17202b;--ink-2:#46525f;--ink-3:#5f6b78;--rule:#d8dee6;--rule-2:#e7ebf0;
+  --blue:#23457a;--blue-tint:#e5ecf6;--stamp:#c0352a;--stamp-tint:#fbe8e5;--due:#8f5300;--due-tint:#fcefd8;
+  --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#10141a;--sheet:#171d25;--ink:#e6eaf0;--ink-2:#b3bdc9;--ink-3:#919daa;--rule:#2b343f;--rule-2:#222a34;
+  --blue:#9fbcea;--blue-tint:#1d293b;--stamp:#ff7b6c;--stamp-tint:#3a201d;--due:#f0b35a;--due-tint:#362913;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;padding-top:env(safe-area-inset-top,0px)}
+::selection{background:var(--blue-tint);color:var(--ink)}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px calc(48px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:32px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:6px}
+
+.top h1{margin:0;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.top p{margin:4px 0 0;color:var(--ink-2);font-size:13.5px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--sheet);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:500;white-space:nowrap;transition:border-color .15s}
+.btn:hover{border-color:var(--blue)}
+.btn svg{width:15px;height:15px;flex:none}
+
+.book{background:var(--sheet);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+.book-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 16px;border-top:1px dashed var(--rule)}
+.book-row .k{color:var(--ink-2);font-size:13px;flex:none}
+.book-row .v{text-align:right;min-width:0;overflow-wrap:anywhere}
+.balance{font-size:30px;font-weight:500;line-height:1.1}
+.balance small{font-size:16px;margin-left:2px;font-family:var(--sans)}
+.book-head{padding:16px 16px 14px;display:flex;flex-direction:column;gap:6px}
+
+section{display:flex;flex-direction:column;gap:12px}
+.sec-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:8px;border-bottom:1.5px solid var(--ink)}
+.sec-h h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-.01em}
+.sec-h .meta{color:var(--ink-2);font-size:13px;text-align:right}
+.note{margin:0;color:var(--ink-2);font-size:13.5px}
+
+.stamp{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--stamp);color:var(--stamp);font-size:11.5px;font-weight:700;line-height:1;transform:rotate(-8deg);flex:none}
+.stamp.due{border:0;background:var(--due-tint);color:var(--due);transform:none}
+.stamp.wait{border:1.5px dashed var(--rule);color:var(--ink-3);transform:none;font-weight:500}
+.stamp.future{border:1px solid var(--rule-2);color:transparent;transform:none}
+.stamp.pre{background:var(--stamp-tint)}
+
+.roll{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.roll-i{display:flex;align-items:center;gap:8px;background:var(--sheet);border:1px solid var(--rule-2);border-radius:10px;padding:8px 10px;min-width:0}
+.roll-i span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.owed{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.owed li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;background:var(--due-tint);color:var(--ink);border-radius:8px;font-size:14px}
+.owed li b{color:var(--due);font-weight:700}
+
+.vote-bar{display:grid;grid-template-columns:repeat(var(--n,9),1fr);gap:4px}
+.vote-bar i{height:26px;border-radius:4px;border:1px solid var(--rule);background:var(--sheet)}
+.vote-bar i.yes{background:var(--blue);border-color:var(--blue)}
+.vote-bar i.no{background:var(--rule);border-color:var(--rule)}
+.vote-bar i.line{box-shadow:inset -2px 0 0 0 var(--stamp)}
+.vote-legend{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--ink-2);flex-wrap:wrap}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:500;background:var(--rule-2);color:var(--ink-2);white-space:nowrap}
+.pill.blue{background:var(--blue-tint);color:var(--blue)}
+.pill.red{background:var(--stamp-tint);color:var(--stamp)}
+.pill.due{background:var(--due-tint);color:var(--due)}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.tab{border:1px solid var(--rule);background:transparent;border-radius:999px;padding:4px 12px;font-size:13px}
+.tab[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.ledger{overflow-x:auto;border:1px solid var(--rule);border-radius:12px;background:var(--sheet);-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.ledger table{border-collapse:separate;border-spacing:0;font-size:13px;min-width:100%}
+.ledger th,.ledger td{padding:6px 4px;text-align:center;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+.ledger tr:last-child td,.ledger tr:last-child th{border-bottom:0}
+.ledger thead th{font-weight:500;color:var(--ink-2);font-size:12px;padding-block:9px}
+.ledger thead th.cur{color:var(--blue);font-weight:700}
+.ledger .who{position:sticky;left:0;background:var(--sheet);text-align:left;padding-left:12px;padding-right:8px;font-weight:500;z-index:1;box-shadow:1px 0 0 var(--rule-2)}
+.ledger .sum{padding-inline:10px 12px;text-align:right;font-size:12.5px}
+.ledger .sum.minus{color:var(--due);font-weight:500}
+.ledger .sum.plus{color:var(--blue)}
+.ledger .sum.zero{color:var(--ink-3)}
+.cellplain{display:inline-flex;padding:2px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2)}
+.legend>span{display:inline-flex;align-items:center;gap:6px}
+.legend .stamp{width:22px;height:22px;font-size:10.5px}
+
+.list{display:flex;flex-direction:column;margin:0;padding:0;list-style:none;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;overflow:hidden}
+.list li{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:10px;padding:11px 14px;border-top:1px solid var(--rule-2);min-width:0}
+.list li:first-child{border-top:0}
+.list li.next{background:var(--blue-tint)}
+.list .d{font-size:13px;color:var(--ink-2)}
+.list .name{min-width:0;display:flex;flex-direction:column;overflow-wrap:anywhere}
+.list .name small{color:var(--ink-2);font-size:12.5px}
+.list .end{display:flex;align-items:center;gap:8px}
+.meet li,.extra li{grid-template-columns:72px 1fr auto}
+.meet .q{font-weight:700;font-size:14px}
+.meet .q small{display:block;font-weight:400;color:var(--ink-2);font-size:12px}
+.meet .body{min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px;overflow-wrap:anywhere}
+.muted{color:var(--ink-3)}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px}
+.fallback{width:100%;min-height:150px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink);padding:10px;font:inherit;font-size:14px}
+.state{padding:40px 0;text-align:center;color:var(--ink-2)}
+.state b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+footer{color:var(--ink-3);font-size:12.5px;text-align:center;display:flex;flex-direction:column;gap:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="root"><div class="wrap"><div class="state"><b>장부를 불러오는 중이에요</b>구글 시트에서 최신 기록을 가져오고 있어요.</div></div></main>
+<script>
+(function(){
+  // ── 연결 설정: 구글 시트 "웹에 게시" 주소와 탭별 gid ──
+  var CONFIG={
+    pub:'',
+    gids:{'납부':'','회비':'','설정':'','찬조금':'','선물':'','모임':''}
+  };
+
+  var root=document.getElementById('root');
+  var now=new Date(Date.now()+9*3600e3);
+  var T={y:now.getUTCFullYear(),m:now.getUTCMonth()+1,d:now.getUTCDate()};
+  var CUR=T.y*12+T.m;
+  var S=null,viewYear=null,copied='',fallbackText='';
+  var ADMIN=location.hash==='#총무'||location.hash==='#admin'||decodeURIComponent(location.hash)==='#총무';
+
+  // ---------- helpers ----------
+  function h(tag,p){
+    var el=document.createElement(tag);
+    if(p)for(var k in p){var v=p[k];if(v==null||v===false)continue;
+      if(k==='class')el.className=v;else if(k==='text')el.textContent=v;
+      else if(k.slice(0,2)==='on')el.addEventListener(k.slice(2),v);
+      else el.setAttribute(k,v===true?'':v);}
+    for(var i=2;i<arguments.length;i++)add(el,arguments[i]);
+    return el;
+  }
+  function add(el,c){if(c==null||c===false)return;if(Array.isArray(c)){c.forEach(function(x){add(el,x)});return;}el.append(c.nodeType?c:document.createTextNode(String(c)));}
+  function won(n){return Number(n||0).toLocaleString('ko-KR')+'원';}
+  function key(y,m){return y+'-'+(m<10?'0':'')+m;}
+  function pad(n){return (n<10?'0':'')+n;}
+  function int(v){var s=String(v==null?'':v).replace(/[^0-9-]/g,'');var n=parseInt(s,10);return isNaN(n)?0:n;}
+  function digits(v){return (String(v||'').match(/\d+/g)||[]).map(Number);}
+  // 날짜: "2026-11-27", "2026. 11. 27", "2026/11/27" 모두 받기
+  function ymd(v){var d=digits(v);if(d.length>=3&&d[0]>999)return d[0]+'-'+pad(d[1])+'-'+pad(d[2]);return '';}
+  // 생일: "03-01", "3월 1일", "2026. 3. 1" → [3,1]
+  function md(v){var d=digits(v);if(d.length&&d[0]>999)d.shift();return d.length>=2?[d[0],d[1]]:null;}
+  function dot(s){return s?s.replace(/-/g,'.'):'';}
+  function yes(v){var s=String(v||'').trim();return s!==''&&!/^(x|X|-|미|미납|0)$/.test(s);}
+
+  function parseCSV(t){
+    var rows=[],row=[],f='',q=false;
+    t=t.replace(/^﻿/,'');
+    for(var i=0;i<t.length;i++){var c=t[i];
+      if(q){if(c==='"'){if(t[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+      else if(c==='"')q=true;
+      else if(c===','){row.push(f);f='';}
+      else if(c==='\n'||c==='\r'){if(c==='\r'&&t[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f='';}
+      else f+=c;}
+    if(f!==''||row.length){row.push(f);rows.push(row);}
+    return rows.filter(function(r){return r.some(function(x){return String(x).trim()!=='';});});
+  }
+
+  function csvUrl(tab){
+    var base=CONFIG.pub.replace(/\/pub(html)?(\?.*)?$/,'/pub');
+    return base+'?gid='+encodeURIComponent(CONFIG.gids[tab])+'&single=true&output=csv';
+  }
+  function fetchTab(tab){
+    return fetch(csvUrl(tab),{cache:'no-store'}).then(function(r){if(!r.ok)throw new Error(tab+' '+r.status);return r.text();}).then(parseCSV);
+  }
+
+  function build(t){
+    var s={members:[],fees:{},paid:{},gifts:{},extras:[],meetings:[]};
+    // 설정
+    var cfg={};t['설정'].slice(1).forEach(function(r){if(r[0])cfg[r[0].trim()]=(r[1]||'').trim();});
+    s.club=cfg['모임이름']||'우리 모임';s.clubFull=cfg['모임설명']||'';s.treasurer=cfg['총무']||'';
+    s.balance={amount:int(cfg['통장잔액']),asOf:ymd(cfg['잔액기준일']),note:cfg['잔액메모']||''};
+    s.dueDay=Math.min(28,Math.max(1,int(cfg['납부일'])||10));
+    s.giftBudget=int(cfg['생일선물금액']);
+    s.vote={status:cfg['투표상태']||'투표 전',yes:int(cfg['투표찬성']),no:int(cfg['투표반대']),deadline:ymd(cfg['투표마감']),
+      before:int(cfg['인상전회비'])||10000,after:int(cfg['인상후회비'])||20000,from:(function(){var d=digits(cfg['인상적용월']);return d.length>=2?key(d[0],d[1]):'';})()};
+    // 회비
+    t['회비'].slice(1).forEach(function(r){var y=int(r[0]),f=int(r[1]);if(y>1999&&f>0)s.fees[y]=f;});
+    // 납부
+    var head=t['납부'][0]||[],cols=[];
+    head.forEach(function(c,i){if(i<2)return;var d=digits(c);if(d.length>=2&&d[0]>1999&&d[1]>=1&&d[1]<=12)cols.push({i:i,k:key(d[0],d[1]),y:d[0]});});
+    t['납부'].slice(1).forEach(function(r){var n=(r[0]||'').trim();if(!n)return;
+      s.members.push({name:n,bd:md(r[1])});
+      s.paid[n]=cols.filter(function(c){return yes(r[c.i]);}).map(function(c){return c.k;});});
+    var ys={};cols.forEach(function(c){ys[c.y]=1;});s.years=Object.keys(ys).map(Number).sort();
+    if(!s.years.length)s.years=Object.keys(s.fees).map(Number).sort();
+    // 찬조금
+    t['찬조금'].slice(1).forEach(function(r){var a=int(r[2]);if(a>0)s.extras.push({date:ymd(r[0]),name:(r[1]||'').trim(),amount:a,memo:(r[3]||'').trim()});});
+    // 선물
+    t['선물'].slice(1).forEach(function(r){var y=int(r[0]),n=(r[1]||'').trim();if(y&&n){(s.gifts[y]=s.gifts[y]||{})[n]=true;}});
+    // 모임
+    t['모임'].slice(1).forEach(function(r){if(!r[1])return;s.meetings.push({year:int(r[0]),q:r[1].trim(),months:(r[2]||'').trim(),date:ymd(r[3]),place:(r[4]||'').trim(),status:(r[5]||'').trim()||'미정'});});
+    return s;
+  }
+
+  // ---------- 계산 ----------
+  function fee(y){var f=S.fees[y];if(f==null){var ks=Object.keys(S.fees).map(Number).sort(function(a,b){return a-b;});
+    var below=ks.filter(function(k){return k<=y;});f=S.fees[below.length?below[below.length-1]:ks[0]]||0;}return f;}
+  function isPaid(n,y,m){return (S.paid[n]||[]).indexOf(key(y,m))>=0;}
+  function cell(n,y,m){
+    var i=y*12+m,p=isPaid(n,y,m);
+    if(p)return i>CUR?'pre':'paid';
+    if(i<CUR)return 'due';
+    if(i===CUR)return T.d>S.dueDay?'due':'wait';
+    return 'future';
+  }
+  function tally(n){
+    var owed=0,pre=0,months=[];
+    S.years.forEach(function(y){for(var m=1;m<=12;m++){var c=cell(n,y,m);if(c==='due'){owed+=fee(y);months.push({y:y,m:m});}if(c==='pre')pre+=fee(y);}});
+    return {owed:owed,pre:pre,months:months};
+  }
+  function monthsLabel(ms){
+    if(!ms.length)return '';var a=ms[0],b=ms[ms.length-1];
+    if(ms.length===1)return (a.y!==T.y?a.y%100+'년 ':'')+a.m+'월';
+    return (a.y!==b.y||a.y!==T.y?a.y%100+'년 ':'')+a.m+'~'+(a.y!==b.y?b.y%100+'년 ':'')+b.m+'월';
+  }
+  var STAMP={paid:'납',pre:'선',due:'미',wait:'',future:''};
+  var LABEL={paid:'납부',pre:'선납',due:'미납',wait:'납부 전',future:'예정'};
+  function stamp(c){return h('span',{class:'stamp '+c,'aria-hidden':'true'},STAMP[c]);}
+
+  // ---------- 화면 ----------
+  function header(){
+    return h('header',{class:'top'},h('h1',null,S.club+' 모임 장부'),
+      h('p',null,[S.clubFull,S.treasurer?'총무 '+S.treasurer:''].filter(Boolean).join(' · ')));
+  }
+  function book(){
+    return h('div',{class:'book'},
+      h('div',{class:'book-head'},h('span',{class:'note'},'모임통장 잔액'),
+        h('span',{class:'balance num'},S.balance.amount.toLocaleString('ko-KR'),h('small',null,'원'))),
+      S.balance.asOf?h('div',{class:'book-row'},h('span',{class:'k'},'기준일'),h('span',{class:'v num'},dot(S.balance.asOf))):null,
+      S.balance.note?h('div',{class:'book-row'},h('span',{class:'k'},'메모'),h('span',{class:'v'},S.balance.note)):null,
+      h('div',{class:'book-row'},h('span',{class:'k'},'월 회비'),h('span',{class:'v'},h('span',{class:'num'},won(fee(T.y))),' · 매월 '+S.dueDay+'일까지')));
+  }
+  function thisMonth(){
+    var y=T.y,m=T.m,cnt=0;
+    var roll=S.members.map(function(mb){var c=cell(mb.name,y,m);if(c==='paid'||c==='pre')cnt++;
+      return h('div',{class:'roll-i',title:mb.name+' '+LABEL[c]},stamp(c),h('span',null,mb.name));});
+    var owed=S.members.map(function(mb){return {n:mb.name,t:tally(mb.name)};}).filter(function(x){return x.t.owed>0;});
+    var before=T.d<=S.dueDay;
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,m+'월 회비'),h('span',{class:'meta num'},cnt+' / '+S.members.length+'명 납부')),
+      h('div',{class:'roll'},roll),
+      h('p',{class:'note'},before?(m+'월 '+S.dueDay+'일까지 '+won(fee(y))+'을 모임통장에 넣어 주세요.'):(m+'월 납부일('+S.dueDay+'일)이 지났어요. 아직이면 오늘 넣어 주세요.')),
+      owed.length?h('ul',{class:'owed'},owed.map(function(x){return h('li',null,h('span',null,x.n+' · '+monthsLabel(x.t.months)),h('b',{class:'num'},won(x.t.owed)));})):null);
+  }
+  function vote(){
+    var v=S.vote,n=S.members.length,need=Math.floor(n/2)+1;
+    var bar=[];for(var i=0;i<n;i++)bar.push(h('i',{class:(i<v.yes?'yes':(i>=n-v.no?'no':''))+(i===need-1?' line':'')}));
+    var pc={'투표 중':'blue','가결':'red','부결':'due'}[v.status]||'';
+    var from=v.from?Number(v.from.slice(0,4))+'년 '+Number(v.from.slice(5))+'월분부터':'';
+    var open=v.status!=='가결'&&v.status!=='부결';
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'회비 인상 투표'),h('span',{class:'pill '+pc},v.status+(v.deadline&&open?' · '+Number(v.deadline.slice(5,7))+'/'+Number(v.deadline.slice(8))+' 마감':''))),
+      h('p',{class:'note'},'월 회비 '+won(v.before)+' → '+won(v.after)+(from?', '+from:'')+'. '+n+'명 중 '+need+'명 이상 찬성하면 가결돼요.'),
+      h('div',{class:'vote-bar',style:'--n:'+n,role:'img','aria-label':'찬성 '+v.yes+'명, 반대 '+v.no+'명, 가결 기준 '+need+'명'},bar),
+      h('div',{class:'vote-legend'},h('span',null,'찬성 '+v.yes+' · 반대 '+v.no+' · 미참여 '+Math.max(0,n-v.yes-v.no)),h('span',null,'빨간 선 = 가결 기준 '+need+'명')));
+  }
+  function ledger(){
+    var tabs=h('div',{class:'tabs',role:'group','aria-label':'연도'},S.years.map(function(y){
+      return h('button',{class:'tab','aria-pressed':y===viewYear?'true':'false',onclick:function(){viewYear=y;rerender();}},y+'년');}));
+    var head=h('tr',null,h('th',{class:'who',scope:'col'},'이름'));
+    for(var m=1;m<=12;m++)head.append(h('th',{scope:'col',class:(viewYear===T.y&&m===T.m)?'cur':null},m+'월'));
+    head.append(h('th',{class:'sum',scope:'col'},'잔액'));
+    var rows=S.members.map(function(mb){
+      var tr=h('tr',null,h('th',{class:'who',scope:'row'},mb.name));
+      for(var m=1;m<=12;m++){var c=cell(mb.name,viewYear,m),lbl=mb.name+' '+viewYear+'년 '+m+'월 '+LABEL[c];
+        tr.append(h('td',null,h('span',{class:'cellplain',title:lbl,role:'img','aria-label':lbl},stamp(c))));}
+      var t=tally(mb.name),net=t.pre-t.owed;
+      tr.append(h('td',{class:'sum num '+(net<0?'minus':net>0?'plus':'zero')},net<0?'-'+won(-net):net>0?'선납 '+won(net):'0'));
+      return tr;});
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'납부 장부'),tabs),
+      h('div',{class:'ledger'},h('table',null,h('thead',null,head),h('tbody',null,rows))),
+      h('div',{class:'legend'},h('span',null,stamp('paid'),'납부'),h('span',null,stamp('pre'),'선납'),
+        h('span',null,stamp('due'),'미납'),h('span',null,stamp('wait'),'이번 달 납부 전')));
+  }
+  function extras(){
+    var list=S.extras.slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var total=list.reduce(function(a,x){return a+x.amount;},0);
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'찬조금'),h('span',{class:'meta num'},'합계 '+won(total))),
+      list.length?h('ul',{class:'list extra'},list.map(function(x){return h('li',null,
+        h('span',{class:'d num'},x.date?dot(x.date).slice(2):''),
+        h('span',{class:'name'},x.name||'이름 없음',x.memo?h('small',null,x.memo):null),
+        h('span',{class:'num'},won(x.amount)));}))
+      :h('p',{class:'note'},'아직 찬조금 기록이 없어요. 회비 말고 더 낸 돈은 여기에 남겨요.'));
+  }
+  function birthdays(){
+    var today=Date.UTC(T.y,T.m-1,T.d);
+    var list=S.members.filter(function(mb){return mb.bd;}).map(function(mb){
+      var mm=mb.bd[0],dd=mb.bd[1],y=T.y,t=Date.UTC(y,mm-1,dd);if(t<today){y++;t=Date.UTC(y,mm-1,dd);}
+      return {n:mb.name,mm:mm,dd:dd,y:y,dday:Math.round((t-today)/864e5)};
+    }).sort(function(a,b){return a.dday-b.dday;});
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'생일'),h('span',{class:'meta'},S.giftBudget?'선물 1인 '+won(S.giftBudget):'선물 금액 미정')),
+      h('ul',{class:'list'},list.map(function(b,i){var g=(S.gifts[b.y]||{})[b.n]===true;
+        return h('li',{class:i===0?'next':null},
+          h('span',{class:'d num'},pad(b.mm)+'.'+pad(b.dd)),
+          h('span',{class:'name'},b.n,h('small',null,b.y+'년 생일')),
+          h('span',{class:'end'},h('span',{class:'num',style:'font-size:13px;color:var(--ink-2)'},b.dday===0?'오늘':'D-'+b.dday),
+            h('span',{class:'pill'+(g?' red':'')},g?'선물 보냄':'선물 전')));})));
+  }
+  function meetings(){
+    if(!S.meetings.length)return null;
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'분기 모임'),h('span',{class:'meta'},'분기마다 한 번')),
+      h('ul',{class:'list meet'},S.meetings.map(function(mt){
+        var pc={'후보 투표 중':'blue','확정':'red'}[mt.status]||'';
+        return h('li',null,
+          h('span',{class:'q'},mt.q,h('small',null,(mt.year||'')+(mt.months?' · '+mt.months:''))),
+          h('span',{class:'body'},mt.date?h('span',{class:'num'},dot(mt.date)):h('span',{class:'muted'},'날짜 미정'),
+            mt.place?h('span',null,mt.place):h('span',{class:'muted'},'장소 미정')),
+          h('span',{class:'pill '+pc},mt.status));})));
+  }
+
+  // 총무용: 주소 끝에 #총무 를 붙이면 보임
+  function noticeMonth(){var y=T.y,m=T.m;if(T.d>S.dueDay){m++;if(m>12){m=1;y++;}}return {y:y,m:m};}
+  function duesNotice(){var nm=noticeMonth();
+    return ['['+S.club+'] '+nm.m+'월 회비 안내','','이번 달 회비는 '+won(fee(nm.y))+'이에요.',nm.m+'월 '+S.dueDay+'일까지 모임통장에 넣어 주세요.','','납부 현황은 여기서 볼 수 있어요.',location.href.split('#')[0]].join('\n');}
+  function voteNotice(){var v=S.vote,n=S.members.length,need=Math.floor(n/2)+1;
+    return ['['+S.club+'] 회비 인상 투표','','월 회비를 '+won(v.before)+'에서 '+won(v.after)+'으로 올리는 안이에요.',
+      v.from?'- 적용: '+Number(v.from.slice(0,4))+'년 '+Number(v.from.slice(5))+'월분부터':'','- 가결: '+n+'명 중 '+need+'명 이상 찬성',
+      '- 마감: '+(v.deadline?Number(v.deadline.slice(5,7))+'월 '+Number(v.deadline.slice(8))+'일':'추후 공지'),'','위 투표에 꼭 참여해 주세요.'].filter(function(x,i){return x!==''||i===1||i===6;}).join('\n');}
+  var ICON_COPY='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>';
+  function copyBtn(id,label,fn){var b=h('button',{class:'btn',onclick:function(){copyText(id,fn());}});var s=document.createElement('span');s.style.display='inline-flex';s.innerHTML=ICON_COPY;b.append(s,copied===id?'복사됨':label);return b;}
+  function copyText(id,text){
+    function fail(){fallbackText=text;copied='';rerender();}
+    try{navigator.clipboard.writeText(text).then(function(){copied=id;fallbackText='';rerender();setTimeout(function(){if(copied===id){copied='';rerender();}},2200);},fail);}catch(e){fail();}
+  }
+  function treasurer(){
+    if(!ADMIN)return null;
+    return h('section',null,
+      h('div',{class:'sec-h'},h('h2',null,'총무 메뉴'),h('span',{class:'meta'},'주소 끝 #총무 일 때만 보여요')),
+      h('div',{class:'tools'},copyBtn('dues','회비 안내문 복사',duesNotice),copyBtn('vote','투표 공지 복사',voteNotice)),
+      fallbackText?h('textarea',{class:'fallback',readonly:true,'aria-label':'복사할 글'},fallbackText):null);
+  }
+
+  var loadedAt='';
+  function render(){
+    root.replaceChildren(h('div',{class:'wrap'},header(),book(),thisMonth(),vote(),ledger(),extras(),birthdays(),meetings(),treasurer(),
+      h('footer',null,h('span',null,'잔액은 모임통장 앱이 기준이에요. 총무가 구글 시트로 기록해요.'),h('span',{class:'num'},loadedAt+' 불러옴'))));
+  }
+  function rerender(){var y=window.scrollY;render();window.scrollTo(0,y);}
+  function fail(title,body){root.replaceChildren(h('div',{class:'wrap'},h('div',{class:'state'},h('b',null,title),body)));}
+
+  if(!CONFIG.pub){fail('아직 시트와 연결되지 않았어요','총무가 구글 시트 게시 주소를 넣으면 장부가 보여요.');return;}
+  var tabs=Object.keys(CONFIG.gids),t={};
+  Promise.all(tabs.map(function(k){return fetchTab(k).then(function(r){t[k]=r;});})).then(function(){
+    S=build(t);
+    viewYear=S.years.indexOf(T.y)>=0?T.y:S.years[S.years.length-1];
+    loadedAt=pad(T.m)+'.'+pad(T.d)+' '+pad(now.getUTCHours())+':'+pad(now.getUTCMinutes());
+    render();
+  }).catch(function(){fail('장부를 불러오지 못했어요','잠시 뒤 새로고침해 주세요. 계속 안 되면 총무에게 알려 주세요.');});
+})();
+</script>
+</body>
+</html>
