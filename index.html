@@ -254,7 +254,7 @@ footer{color:var(--ink-3);font-size:12.5px;text-align:center;display:flex;flex-d
     return h('section',null,
       h('div',{class:'sec-h'},h('h2',null,m+'월 회비'),h('span',{class:'meta num'},cnt+' / '+S.members.length+'명 납부')),
       h('div',{class:'roll'},roll),
-      h('p',{class:'note'},before?(m+'월 '+S.dueDay+'일까지 '+won(fee(y))+'을 모임통장에 넣어 주세요.'):(m+'월 납부일('+S.dueDay+'일)이 지났어요. 아직이면 오늘 넣어 주세요.')),
+      h('p',{class:'note'},cnt===S.members.length?(m+'월 회비는 모두 냈어요.'):before?(m+'월 '+S.dueDay+'일까지 '+won(fee(y))+'을 모임통장에 넣어 주세요.'):(m+'월 납부일('+S.dueDay+'일)이 지났어요. 아직이면 오늘 넣어 주세요.')),
       owed.length?h('ul',{class:'owed'},owed.map(function(x){return h('li',null,h('span',null,x.n+' · '+monthsLabel(x.t.months)),h('b',{class:'num'},won(x.t.owed)));})):null);
   }
   function vote(){
