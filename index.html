@@ -34,6 +34,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 .top h1{margin:0;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
 .top p{margin:4px 0 0;color:var(--ink-2);font-size:13.5px}
+.officers{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:2px}
+.officers li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2);padding:5px 0;border-top:1px dashed var(--rule)}
+.officers li:first-child{border-top:0}
+.officers li.cur{color:var(--ink)}
+.officers .per{width:64px;flex:none;font-size:12.5px;color:var(--ink-3)}
+.officers li.cur .per{color:var(--blue)}
+.officers .who{min-width:0;flex:1}
+.officers b{font-weight:500}
 .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--sheet);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:500;white-space:nowrap;transition:border-color .15s}
 .btn:hover{border-color:var(--blue)}
 .btn svg{width:15px;height:15px;flex:none}
@@ -233,9 +241,25 @@ footer{color:var(--ink-3);font-size:12.5px;text-align:center;display:flex;flex-d
   function stamp(c){return h('span',{class:'stamp '+c,'aria-hidden':'true'},STAMP[c]);}
 
   // ---------- 화면 ----------
+  // 임원진: 기간이 바뀌면 여기에 한 줄 추가
+  var OFFICERS=[
+    {from:null,to:2026,chair:'박용해',sec:'박상준'},
+    {from:2027,to:null,chair:'홍진기',sec:'전민혁'}
+  ];
+  function officers(){
+    var rows=OFFICERS.slice().reverse().map(function(o){
+      var cur=(o.from==null||T.y>=o.from)&&(o.to==null||T.y<=o.to);
+      var period=o.from==null?'~'+o.to+'년':o.to==null?o.from+'년~':o.from+'~'+o.to+'년';
+      return h('li',{class:cur?'cur':null},
+        h('span',{class:'per num'},period),
+        h('span',{class:'who'},'회장 ',h('b',null,o.chair),' · 총무 ',h('b',null,o.sec)),
+        cur?h('span',{class:'pill blue'},'지금'):null);
+    });
+    return h('ul',{class:'officers','aria-label':'임원진'},rows);
+  }
   function header(){
     return h('header',{class:'top'},h('h1',null,S.club+' 모임 장부'),
-      h('p',null,[S.clubFull,S.treasurer?'총무 '+S.treasurer:''].filter(Boolean).join(' · ')));
+      S.clubFull?h('p',null,S.clubFull):null,officers());
   }
   function book(){
     return h('div',{class:'book'},
